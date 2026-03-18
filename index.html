@@ -1,0 +1,640 @@
+<!DOCTYPE html>  <html lang="vi">    <head>    
+<meta name="viewport" content="width=device-width, initial-scale=1">  
+<meta charset="UTF-8">    
+<title>Trắc nghiệm Công Nghệ+ Đúng Sai( vanducA9 )</title>    
+<style>  
+.flex-row{  
+display:flex;  
+gap:10px;  
+align-items:flex-start;  
+flex-wrap:wrap;  
+}  
+#scorePopup{  
+position:fixed;  
+top:0;  
+left:0;  
+width:100%;  
+height:100%;  
+background:rgba(0,0,0,0.6);  
+display:none;  
+align-items:center;  
+justify-content:center;  
+z-index:999;  
+}  .popupBox{
+background:white;
+padding:30px;
+border-radius:14px;
+text-align:center;
+width:80%;
+max-width:320px;
+animation:pop 0.4s ease;
+}
+
+.popupBox h1{
+font-size:36px;
+color:#2e7d32;
+margin-bottom:10px;
+}
+
+.popupBox p{
+font-size:22px;
+margin-bottom:15px;
+}
+
+.popupBox button{
+padding:12px 20px;
+font-size:18px;
+background:#1e88e5;
+color:white;
+border:none;
+border-radius:8px;
+}
+.question-img{
+  width:220px;
+  max-width:90%;
+  height:auto;
+  border-radius:8px;
+  display:block;
+  margin:10px auto;
+}
+
+@keyframes pop{
+0%{transform:scale(0.5);opacity:0}
+100%{transform:scale(1);opacity:1}
+}
+#result{
+animation:pop 0.5s ease;
+}
+
+@keyframes pop{
+0%{transform:scale(0.6);opacity:0}
+100%{transform:scale(1);opacity:1}
+}
+#result{
+margin-top:20px;
+padding:18px;
+font-size:28px;
+font-weight:bold;
+text-align:center;
+background:linear-gradient(135deg,#4caf50,#2e7d32);
+color:white;
+border-radius:12px;
+box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+table{
+margin:6px auto;
+font-size:12px;
+background:white;
+border-collapse:collapse;
+max-width:100%;
+}
+
+table th, table td{
+border:1px solid #666;
+padding:3px 5px;
+text-align:center;
+}
+
+table th{
+background:#a2f2f2;
+font-weight:bold;
+}
+white-space:nowrap;
+}
+
+/* toàn trang */
+body{
+font-family:Arial;
+padding:16px;
+line-height:1.6;
+background:#f3f3f3;
+}
+
+.group-grid{
+display:grid;
+grid-template-columns:1fr;
+gap:16px;
+margin-bottom:24px;
+}
+
+.passage{
+font-weight:bold;
+margin-bottom:10px;
+}
+
+.question-row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px;
+}
+
+.question{
+background:white;
+padding:8px 10px;
+border-radius:10px;
+box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.question b{
+display:block;
+white-space:pre-line;
+margin-bottom:3px;
+}
+
+.question label{
+display:block;
+margin:4px 0;
+padding:3px 4px;
+border-radius:6px;
+}
+button{
+width:100%;
+padding:14px;
+font-size:18px;
+margin-top:14px;
+border:none;
+border-radius:10px;
+background:#1e98e5;
+color:white;
+font-weight:bold;
+}
+button:empty{
+display:none;
+}
+
+#redoBtn{
+background:#43a047;
+}
+.correct{
+background:#d4edda;
+color:#155724;
+font-weight:bold;
+}
+
+.wrong{
+background:#f8d7da;
+color:#723c24;
+font-weight:bold;
+}
+#topBtn{
+position:fixed;
+bottom:25px;
+right:20px;
+width:55px;
+height:55px;
+border-radius:50%;
+background:#a2f800;
+color:white;
+font-size:26px;
+border:none;
+display:none;
+cursor:pointer;
+box-shadow:0 4px 12px rgba(0,0,0,0.3);
+transition:0.3s;
+}
+
+#topBtn:hover{
+transform:scale(1.1);
+background:#fb1c00;
+}
+#popupDetail{
+font-size:18px;
+margin-bottom:10px;
+}
+
+#popupBar{
+width:100%;
+height:10px;
+background:#ddd;
+border-radius:6px;
+margin-top:8px;
+}
+
+#popupBarFill{
+height:10px;
+width:0%;
+background:#4caf50;
+border-radius:6px;
+transition:0.3s;
+}
+</style>
+
+</head>    
+<body>  <h2>TRẮC NGHIỆM CÔNG NGHỆ (22câu)</h2>    
+<form id="quiz"></form>  <h2>PHẦN ĐÚNG / SAI</h2>  
+<div id="dsquiz"></div>  <h3 id="result" style="display:none"></h3>  
+<button id="checkBtn" type="button" onclick="submitAll()">  
+CHECK ĐÁP ÁN THÔI!!!  
+</button>  <button id="redoBtn" type="button" onclick="redoQuiz()" style="display:none">  
+LÀM LẠI  
+</button>  <div id="scorePopup">  
+<div class="popupBox">  <h1>🏆 <span id="popupScore">0 / 62</span></h1>  <p id="popupPercent">0% chính xác</p>  <p id="popupDetail"></p>  <div id="popupBar">  
+<div id="popupBarFill"></div>  
+</div>  <button onclick="redoQuiz()">LÀM LẠI</button>
+<button onclick="closePopup()">ĐÓNG</button>
+
+</div>  
+</div>  
+<button id="topBtn" onclick="goTop()">↑</button>  <script>  
+function closePopup(){  
+document.getElementById("scorePopup").style.display="none";  
+}  
+function goTop(){  
+window.scrollTo({  
+top:0,  
+behavior:"smooth"  
+});  
+}  
+  
+// hiện nút khi cuộn xuống  
+window.onscroll=function(){  
+  
+let btn=document.getElementById("topBtn");  
+  
+if(document.documentElement.scrollTop>200){  
+btn.style.display="block";  
+}else{  
+btn.style.display="none";  
+}  
+  
+}  
+let submitted=false;  
+  
+function shuffle(arr){  
+for(let i=arr.length-1;i>0;i--){  
+let j=Math.floor(Math.random()*(i+1));  
+[arr[i],arr[j]]=[arr[j],arr[i]];  
+}  
+}  
+
+  
+    
+let mcq=[
+
+{q:"Câu 1: Thiết kế điện tử là:",a:[
+"Nghiên cứu, ứng dụng kiến thức về kĩ thuật điện tử để tạo ra bản thiết kế nguyên lí, thử nghiệm hoạt động của mạch nguyên lí..",
+"Sử dụng các dây chuyền công nghệ hoặc máy và công cụ hỗ trợ để tạo ra thiết bị điện tử từ vật liệu, linh kiện theo bản thiết kế ban đầu và quy trình kiểm soát chất lượng ",
+"Kết nối và kiểm tra hoạt động của thiết bị điện tử riêng lẻ theo tiêu chuẩn kĩ thuật và an toàn ",
+"Hoạt động nhằm duy trì chế độ làm việc bình thường của thiết bị điện đáp ứng các yêu cầu chất lượng, độ tin cậy và kinh tế "
+],c:0},
+
+{q:"Câu 2: Sản xuất thiết bị điện tử là:",a:[
+"Nghiên cứu, ứng dụng kiến thức về kĩ thuật điện tử để tạo ra bản thiết kế mạch nguyên lí, thử nghiệm hoạt động của mạch nguyên lí, bản thiết kế mạch in và các thành phần cần thiết khác của thiết bị nhằm đáp ứng được yêu cầu đặt ra ",
+"Sử dụng dây chuyền công nghệ hoặc máy và công cụ hỗ trợ để tạo ra  thiết bị điện tử từ vật liệu, linh kiện theo bản thiết kế",
+"Kết nối và kiểm tra hoạt động của thiết bị điện tử riêng lẻ theo tiêu chuẩn kĩ thuật và an toàn ",
+"Hoạt động nhằm duy trì chế độ làm việc bình thường của thiết bị điện đáp ứng các yêu cầu chất lượng, độ tin cậy và kinh tế"
+],c:1},
+
+{q:"Câu 3: Kĩ sư thiết kế thiết bị điện tử có nhiệm vụ:",a:[
+"Tổ chức sản xuất",
+"Nghiên cứu tư vấn và thiết kế các thiết hoặc linh kiện điện tử, mạch điện, chất bán dẫn và hệ thống điện tử",
+"Thiết lập các tiêu chuẩn và quy định kiểm soát để đảm bảo hoạt động hiệu quả, an toàn cho các thiết bị và hệ thống điện tử",
+"Lắp đặt thiết bị"
+],c:1},
+
+{q:"Câu 4: Kĩ sư sản xuất có nhiệm vụ:",a:[
+"Quy định phương pháp lắp đặt, chỉ đạo công việc lắp đặt các sản phẩm và hệ thống điện tử",
+"Nghiên cứu, tư vấn và thiết kế các thiết bị hoặc linh kiện điện tử, mạch điện, chất bán dẫn và hệ thống điện tử ",
+" Tổ chức Vận hành và đảm bảo kĩ thuật hệ thống sản xuất đc tối ưu",
+"Kiểm tra linh kiện"
+],c:2},
+
+{q:"Câu 5: Vạch thứ tư kim nhũ sai số:",a:["2%","5%","10%","20%"],c:1},
+
+{q:"Câu 6: Giá trị điện trở cho biết:",a:[
+"Mức cản trở dòng điện của điện trở ",
+"Khả năng tích lũy năng lượng điện trường của tụ điện khi có điện áp thuận đặt lên hai cực của nó ",
+"Khả năng tích lũy năng lượng từ trường của cuộn cảm khi có dòng điện chạy qua nó",
+"Mức độ dòng điện"
+],c:0},
+
+{q:"Câu 7: Điện dung tụ điện cho biết:",a:[
+"Cản trở dòng điện",
+"Khả năng tích lũy năng lượng điện trường của tụ điện khi có điện áp thuận đặt lên hai cực của nó ",
+" Khả năng tích lũy năng lượng từ trường của cuộn cảm khi có dòng điện chạy qua nó ",
+"Độ mạnh dòng điện"
+],c:2},
+
+{q:"Câu 8: Tụ điện cho dòng điện:",a:[
+"Một chiều",
+"Xoay chiều đi qua ",
+"Cả hai",
+"Không dòng"
+],c:1},
+
+{q:"Câu 9: Cuộn cảm cho dòng:",a:[
+"Một chiều đi qua ",
+"Cao tần",
+"Cả hai",
+"Không dòng"
+],c:0},
+
+{q:"Câu 10: Công dụng transistor:",a:[
+"Cho dòng 1 chiều",
+"Thực hiện các chức năng như khuếch đại tín hiệu, chuyển mạch điện tử vs 2 trạng thái đóng hoặc mở",
+"Thực hiện chức năng như: khuếch đại, tạo dao động, bộ nhớ máy tính, vi xử lí  ",
+"Hạn chế dòng"
+],c:1},
+
+{q:"Câu 11: Công dụng IC:",a:[
+"Cho dòng 1 chiều",
+"Thực hiện các chức năng như khuếch đại tín hiệu, chuyển mạch điện tử với hai trạng thái đóng và mở ",
+"Khuếch đại, dao động, vi xử lí bộ nhớ máy tính",
+"Hạn chế dòng"
+],c:2},
+
+{q:"Câu 12: Điện áp ngược diode:",a:[
+"Trị số dòng điện lớn nhất cho phép chạy qua diode mà vẫn đảm bảo an toàn ",
+"Trị số điện áp lớn nhất cho phép đặt lên 2 cực diode mà vẫn đảm bảo an toàn",
+"Trị số dòng điện tối thiểu chạy qua diode ",
+"Điện áp nhỏ"
+],c:1},
+
+{q:"Câu 13: Dòng định mức diode:",a:[
+"Trị số Dòng điện lớn nhất cho phép chạy qua diode..",
+"Điện áp lớn nhất",
+"Dòng nhỏ",
+"Trị số điện áp tối thiểu đặt lên hai cực của diode"
+],c:0},
+
+{q:"Câu 14: Hai loại transistor:",a:[
+"NPN,PNN",
+"NPN,PNP",
+"PPN,PNP",
+"NNP,NPN"
+],c:1},
+
+{q:"Câu 15: IC thường có:",a:[
+"1 hoặc 2 hàng chân",
+"2 hoặc 3 hàng chân",
+"3 hoặc 4 hàng chân",
+"4 hoặc 5 hàng chân"
+],c:0},
+
+{q:"Câu 16: Tín hiệu tương tự biểu diễn:",a:[
+"Dòng điện hoặc công suất",
+"Dòng điện hoặc điện áp",
+"Công suất hoặc thời gian",
+"Công suất hoặc tần số"
+],c:1},
+
+{q:"Câu 17: Mạch điện tử tương tự không dùng:",a:[
+"Điện trở",
+"Cầu dao",
+"Tụ điện",
+"Cuộn cảm"
+],c:1},
+
+{q:"Câu 18: Mạch  Khuếch đại biên độ điện áp biến đổi biên độ tín hiệu ra...:",a:[
+"Lớn hơn",
+"Nhỏ hơn",
+"Bằng",
+"Bằng hoặc lớn"
+],c:0},
+
+{q:"Câu 19: Hệ số khuếch đại phụ thuộc:",a:[
+"Chu kì",
+"Điện áp vào",
+"Trị số của các điện trở R1,R2",
+"Điện áp ra"
+],c:2},
+
+{q:"Câu 20: Khuếch đại thuật toán:",a:[
+"mạch tích hợp có 1 lối vào 2 lối ra",
+" mạch tích hợp có 2 lối  vào 1 lối  ra",
+"mạch tích hợp có 3 lối vào 1 lối ra",
+"mạch tích hợp có 2 lối vào 2 lối ra"
+],c:1},
+
+{q:"Câu 21: Đâu ko phải ứng dụng của khuếch đại thuật toán :",a:[
+"Khuếch đại đảo",
+"Khuếch đại nghịch",
+"Cộng đảo",
+"Cộng không đảo"
+],c:1},
+
+{q:"Câu 22: Một điện trở có giá trị 56x109 Ω ±10%. Vạch màu tương ứng theo thứ tự là:",a:[
+"xanh lục,xanh lam, trắng, ngân nhũ",
+"Xanh lụ, xanh lam, tím, kim nhũ",
+"Xanh lam, xanh lục, tím, ngân nhũ",
+"Xanh lam, xanh lục, trắng, kim nhũ"
+],c:0}
+];
+  
+let quiz = document.getElementById("quiz");  
+let qIndex = mcq.length;  
+shuffle ( mcq);  
+mcq.forEach((x,i)=>{  
+  
+let answers = x.a.map((text,index)=>({text,index}));  
+  
+shuffle(answers);  
+  
+x.shuffledAnswers = answers;  
+  
+quiz.innerHTML += `  
+<div class="question" id="q${i}" data-correct="${answers.findIndex(a=>a.index===x.c)}">  
+<div class="flex-row">  
+  
+<div>  
+<b>${x.q}</b>  
+  
+<div class="result"></div>  
+  
+${answers.map((o,idx)=>`  
+<label>  
+<input type="radio" name="q${i}" value="${idx}">  
+${o.text}  
+</label>  
+`).join("")}  
+  
+</div>  
+  
+${x.image ? `<img src="${x.image}" style="max-width:260px">` : ""}  
+  
+</div>  
+  
+</div>  
+`;  
+});  
+    
+// ---------------- 6 câu đúng sai ----------------    
+let dsq=[
+
+{
+q:"Câu 1:Vận hành thiết bị điện tử là thao tác đóng cắt, điều chỉnh đúng quy trình các thiết bị và hệ thống điện tử nhằm khai thác hiệu quả, đúng chức năng, đảm bảo làm việc an toàn, không xảy ra sự cố cho người và thiết bị. Nhận định nào sau đây là đúng khi nói về ngành vận hành thiết bị điện tử::",
+a:[
+"A) Công việc vận hành thiết bị điện tử tại các trung tâm kĩ thuật thường được thực hiện bởi các thợ điện",
+"B) Công việc vận hành điện thường được hỗ trợ bởi các thiết bị đo lường",
+"C) Công việc vận hành điện có thể thực hiện trong nhà hoặc nơi đặt các máy sản xuất, đôi khi trên địa hình phức tạp, môi trường khắc nghiệt ",
+"D) Công việc chính trong vận hành điện là lựa chọn công nghệ sản xuất phù hợp, đảm bảo đúng yêu cầu kĩ thuật "
+],
+c:[0,1,1,0]
+},
+
+{
+q:"Câu 2: Khi tìm hiểu về các linh kiện điện trở, tụ điện và cuộn cảm. Em hãy cho biết phát biểu nào sau đây là đúng, phát biểu nào là sai?:",
+a:[
+"A. Trị số điện trở cho biết mức độ cản trở dòng điện của điện trở",
+"B. Trị số điện dung cho biết khả năng tích luỹ điện trường của tụ điện khi có điện áp đặt lên hai cực của tụ điện",
+"C. Công suất định mức của điện trở là công suất tiêu hao trên điện trở mà nó có thể chịu đựng được trong thời gian ngắn mà không hỏng",
+"D. Trị số điện cảm cho biết khả năng tích luỹ năng lượng từ trường khi có dòng điện chạy qua.	"
+],
+c:[1,1,0,1]
+},
+
+{
+q:"Câu 3: Mạch khuếch đại tín hiệu là mạch điện tử làm tăng biên độ tín hiệu mà không làm thay đổi dạng tín hiệu. Hình bên là các tín hiệu vào và ra của mạch khuếch đại. Như vậy, U1 và U2 có mối quan hệ: :",
+a:[
+"a. U1 là tín hiệu đầu ra, U2 là tín hiệu đầu vào của mạch khuếch đại. ",
+"b. U1 là tín hiệu đầu vào, U2 là tín hiệu đầu ra của mạch khuếch đại. ",
+"c. U2 được khuếch đại và giữ nguyên dạng tín hiệu so với U1 ",
+"d. U2 được khuếch đại nhưng bị méo dạng tín hiệu so với U1"
+],
+c:[0,1,1,0],
+image :"Screenshot_2026-03-05-19-12-28-30.jpg"},
+]
+  
+let dsquiz = document.getElementById("dsquiz");  
+  
+dsq.forEach((block,gi)=>{  
+
+dsquiz.innerHTML += `
+  <div class="question">
+    <b>${block.q}</b>
+    ${block.image ? `<div style="text-align:center;"><img src="${block.image}" style="width:180px;max-width:85%;height:auto;"></div>` : ""}
+`;
+
+block.a.forEach((text,i)=>{  
+
+let id = qIndex;  
+let name = "q"+id;  
+let correct = block.c[i];  
+
+dsquiz.innerHTML += `  
+<div id="q${id}" data-correct="${correct}"   
+style="margin:10px 0;padding:8px;background:#f7f7f7;border-radius:6px">  
+
+<label style="margin-right:10px">  
+<input type="radio" name="${name}" value="1"> Đúng  
+</label>  
+
+<label style="margin-right:10px">  
+<input type="radio" name="${name}" value="0"> Sai  
+</label>  
+
+<span>${text}</span>  
+<div class="result"></div>  
+</div>  
+`;  
+
+qIndex++;  
+
+});  
+
+dsquiz.innerHTML += `</div>`;  
+
+});
+  
+function submitAll(){  
+  
+let correct=0;  
+let wrong=0;  
+let blank=0;  
+let total=qIndex;  
+  
+let resultBoxes=document.querySelectorAll(".result");  
+  
+for(let i=0;i<qIndex;i++){
+
+let radios=document.getElementsByName("q"+i);
+let chosen=null;
+
+let box=document.getElementById("q"+i);
+let correctValue=box.dataset.correct;
+
+let correctText="";
+let chosenText="";
+
+for(let j=0;j<radios.length;j++){
+
+let r=radios[j];
+let label=r.parentElement;
+
+if(r.value==correctValue){
+correctText=label.innerText;
+label.classList.add("correct");
+}
+
+if(r.checked){
+chosen=r;
+chosenText=label.innerText;
+}
+
+}
+
+if(!chosen){
+
+blank++;
+
+resultBoxes[i].innerHTML=
+"Bạn chọn: <span style='color:red;font-weight:bold'>Chưa chọn ❌</span> - Đáp án: <span style='color:green;font-weight:bold'>"+correctText+"</span>";
+
+}
+
+else if(chosen.value==correctValue){
+
+correct++;
+
+resultBoxes[i].innerHTML=
+"Bạn chọn: <span style='color:green;font-weight:bold'>"+chosenText+" ✔</span>";
+
+}
+
+else{
+
+wrong++;
+
+chosen.parentElement.classList.add("wrong");
+
+resultBoxes[i].innerHTML=
+"Bạn chọn: <span style='color:red;font-weight:bold'>"+chosenText+" ❌</span> - Đáp án: <span style='color:green;font-weight:bold'>"+correctText+"</span>";
+
+}
+
+}
+  
+let percent=Math.round((correct/total)*100);  
+  
+document.getElementById("popupScore").innerHTML =  
+correct+" / "+total;  
+  
+document.getElementById("popupDetail").innerHTML =  
+"✅ Đúng: "+correct+  
+" | ❌ Sai: "+wrong+  
+" | ⚪ Chưa làm: "+blank;  
+  
+document.getElementById("popupPercent").innerHTML =  
+percent+"% chính xác";  
+  
+document.getElementById("scorePopup").style.display="flex";  
+  
+document.getElementById("result").innerHTML =  
+"🏆 Điểm: "+correct+" / "+total;  
+  
+document.getElementById("result").style.display="block";  
+  
+document.getElementById("redoBtn").style.display="block";  
+document.getElementById("checkBtn").style.display="none";  
+  
+document.getElementById("popupBarFill").style.width =  
+percent+"%";  
+  
+}  
+  
+  
+function redoQuiz(){  
+location.reload();  
+}  
+</script>    </body>    
+</html>   
